@@ -1,0 +1,234 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Turn Taking</title>
+
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <script src="phaser.min.js"></script>
+        <!--<script src="//cdn.jsdelivr.net/phaser/2.6.2/phaser.min.js"></script>-->
+    </head>
+    <body>
+<script type="text/javascript">
+
+window.onload = function() {
+
+
+var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.CANVAS, 'phaser-example', { preload: preload, create: create, update: update, render: render });
+    
+
+function preload() {
+
+     
+    
+    game.load.image('bball', 'assets/images/yball.png');
+    game.load.image('pball', 'assets/images/rball.png');
+    game.load.image('gball', 'assets/images/bball.png');
+    game.load.image('arrow1', 'assets/images/newarrow.png');
+    game.load.image('arrowd', 'assets/images/newarrowd.png');
+    game.load.audio('bBounce', 'assets/audio/big_bounce.mp3');
+    game.load.audio('bounce', 'assets/audio/bounce1.mp3');
+    game.load.audio('bubble', 'assets/audio/bubble.mp3');
+    game.load.audio('bounce1', 'assets/audio/blop.mp3');
+
+}
+    
+  
+    
+function create() {
+    
+    if (window.DeviceOrientationEvent){
+		window.addEventListener("deviceorientation", function(event){
+            console.log (Math.round(event.beta))
+            y = (Math.round(event.beta))
+            game.physics.p2.gravity.y = 10 * y
+        }, true);
+	} 
+    
+    window.addEventListener("deviceorientation", this.handleOrientation, true);
+    
+     
+
+    
+    bBounce = game.add.audio('bBounce');
+    bounce = game.add.audio('bounce');
+    bubble = game.add.audio('bubble');
+    pop = game.add.audio('bounce1', 0.5);
+    
+    bBounce.allowMultiple = true;
+    bounce.allowMultiple = true;
+    bubble.allowMultiple = true;
+
+    game.physics.startSystem(Phaser.Physics.P2JS);
+   
+    
+    //console.log (game.physics.p2.gravity.x)
+    
+    game.physics.p2.setImpactEvents(true);
+    game.physics.p2.restitution = 0.8;
+    
+    var bballCollisionGroup = game.physics.p2.createCollisionGroup();
+    var pballCollisionGroup = game.physics.p2.createCollisionGroup();
+    var gballCollisionGroup = game.physics.p2.createCollisionGroup();
+    var arrowCollisionGroup = game.physics.p2.createCollisionGroup();
+    
+
+    //  Some balls to collide with
+    bballs = game.add.physicsGroup(Phaser.Physics.P2JS);
+    pballs = game.add.physicsGroup(Phaser.Physics.P2JS);
+    gballs = game.add.physicsGroup(Phaser.Physics.P2JS);
+    arrows = game.add.physicsGroup(Phaser.Physics.P2JS);
+    
+    
+    game.physics.p2.updateBoundsCollisionGroup();
+
+    for (var i = 0; i < 2; i++)
+    {
+        var bball = bballs.create(game.world.randomX, game.world.randomY, 'bball');
+        bball.body.setCircle(203);
+        bball.scale.setTo(0.8, 0.8);
+        bball.body.setCollisionGroup(bballCollisionGroup);
+        bball.body.collides([bballCollisionGroup, pballCollisionGroup, gballCollisionGroup]);
+        bball.inputEnabled = true;
+        bball.events.onInputDown.add(popbball, this);
+       
+        
+    }
+    
+    for (var i = 0; i < 5; i++)
+    {
+        var pball = pballs.create(game.world.randomX, game.world.randomY, 'pball');
+        pball.body.setCircle(128);
+        pball.scale.setTo(0.5, 0.5);
+        pball.body.setCollisionGroup(pballCollisionGroup);
+        pball.body.collides([pballCollisionGroup, bballCollisionGroup, gballCollisionGroup]);
+        pball.inputEnabled = true;
+        pball.events.onInputDown.add(popbball, this);
+    }
+    
+    for (var i = 0; i < 8; i++)
+    {
+        var gball = gballs.create(game.world.randomX, game.world.randomY, 'gball');
+        gball.body.setCircle(50);
+        gball.scale.setTo(0.2, 0.2);
+        gball.body.setCollisionGroup(gballCollisionGroup);
+        gball.body.collides([gballCollisionGroup, bballCollisionGroup, pballCollisionGroup]);
+        gball.inputEnabled = true;
+        gball.events.onInputDown.add(popbball, this);
+    }
+    
+    gball.body.onBeginContact.add(ghit, this);
+    
+    function ghit (body, bodyB) {
+        if (body){
+        if (gball.body.velocity.x > 15 || gball.body.velocity.y > 15){
+          bounce.play();
+        }
+    }
+    }
+    
+    pball.body.onBeginContact.add(phit, this);
+    
+    function phit (body, bodyB) {
+      if (body){
+        if (pball.body.velocity.x > 15 || pball.body.velocity.y > 15){
+          bBounce.play();
+        }  
+    }
+    }
+    
+    bball.body.onBeginContact.add(bhit, this);
+    
+    function bhit (body, bodyB) {
+       if (body){
+        if (bball.body.velocity.x > 15 || bball.body.velocity.y > 15){
+          bubble.play();
+        }  
+    }
+    }
+    
+    function popbball (balls) {
+    balls.destroy(balls);
+    pop.play();
+    popCheck();    
+    
+} 
+    
+   
+     function popCheck(){
+        livingB = bballs.countLiving();
+        livingP = pballs.countLiving();
+        livingG = gballs.countLiving();
+        
+     if(livingB < 1 && livingG < 1 && livingP < 1 && y >= 0){
+         
+         
+         var arrow = arrows.create(game.world.centerX, game.world.centerY, 'arrow1');
+         arrow.body.setCollisionGroup(arrowCollisionGroup);
+         //arrow.scale.setTo(2, 2);
+         game.physics.p2.restitution = 1.1;
+         arrow.body.fixedRotation = true;
+         
+         var t=setInterval(upCheck,1000);
+         
+         } else if (livingB < 1 && livingG < 1 && livingP < 1 && y <= 0){
+        
+         var arrowd = arrows.create(game.world.centerX, game.world.centerY, 'arrowd');
+         arrowd.body.setCollisionGroup(arrowCollisionGroup);
+         //arrowd.scale.setTo(2, 2);
+         game.physics.p2.restitution = 1.1;
+         arrowd.body.fixedRotation = true;
+         var t=setInterval(downCheck,1000); 
+         
+    
+         }
+     
+         
+         
+         function upCheck(){
+             console.log("Have I been flipped yet?")
+             if (y < 0 ){
+                 clearInterval(t);
+                 arrow.destroy();
+                 create();
+                 console.log("Yes I have been flipped");
+             } 
+         }
+         
+         function downCheck(){
+             console.log("Have I been flipped yet?")
+             if (y > 0 ){
+                 clearInterval(t);
+                 arrowd.destroy();
+                 create();
+                 console.log("Yes I have been flipped");
+             } 
+         }
+     }
+}
+
+
+    
+
+    
+function render () {
+
+    game.debug.body(bballs);
+    game.debug.body(gballs);
+    game.debug.body(pballs);
+    
+
+}
+
+function update() {}
+ 
+    
+    
+};
+    
+    
+        
+
+</script>
+</body>
+</html>
