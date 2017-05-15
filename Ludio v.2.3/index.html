@@ -3,7 +3,6 @@
     <head>
         <meta charset="UTF-8" />
         <title>Turn Taking</title>
-
         <link rel="stylesheet" type="text/css" href="style.css">
         <script src="phaser.min.js"></script>
         <!--<script src="//cdn.jsdelivr.net/phaser/2.6.2/phaser.min.js"></script>-->
@@ -13,14 +12,10 @@
 
 window.onload = function() {
 
-
 var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.CANVAS, 'phaser-example', { preload: preload, create: create, update: update, render: render });
-    
 
 function preload() {
 
-     
-    
     game.load.image('bball', 'assets/images/yball.png');
     game.load.image('pball', 'assets/images/rball.png');
     game.load.image('gball', 'assets/images/bball.png');
@@ -33,9 +28,9 @@ function preload() {
 
 }
     
-  
-    
 function create() {
+    
+    //set Gravity as y-orientation
     
     if (window.DeviceOrientationEvent){
 		window.addEventListener("deviceorientation", function(event){
@@ -47,21 +42,15 @@ function create() {
     
     window.addEventListener("deviceorientation", this.handleOrientation, true);
     
-     
-
-    
+    //set up our sounds
     bBounce = game.add.audio('bBounce');
     bounce = game.add.audio('bounce');
     bubble = game.add.audio('bubble');
     pop = game.add.audio('bounce1', 0.5);
-    
     bBounce.allowMultiple = true;
     bounce.allowMultiple = true;
     bubble.allowMultiple = true;
-
     game.physics.startSystem(Phaser.Physics.P2JS);
-   
-    
     //console.log (game.physics.p2.gravity.x)
     
     game.physics.p2.setImpactEvents(true);
@@ -72,7 +61,6 @@ function create() {
     var gballCollisionGroup = game.physics.p2.createCollisionGroup();
     var arrowCollisionGroup = game.physics.p2.createCollisionGroup();
     
-
     //  Some balls to collide with
     bballs = game.add.physicsGroup(Phaser.Physics.P2JS);
     pballs = game.add.physicsGroup(Phaser.Physics.P2JS);
@@ -91,7 +79,6 @@ function create() {
         bball.body.collides([bballCollisionGroup, pballCollisionGroup, gballCollisionGroup]);
         bball.inputEnabled = true;
         bball.events.onInputDown.add(popbball, this);
-       
         
     }
     
@@ -119,6 +106,7 @@ function create() {
     
     gball.body.onBeginContact.add(ghit, this);
     
+    //collision detection, play sound
     function ghit (body, bodyB) {
         if (body){
         if (gball.body.velocity.x > 15 || gball.body.velocity.y > 15){
@@ -147,6 +135,7 @@ function create() {
     }
     }
     
+    //destroy bubbles on touch
     function popbball (balls) {
     balls.destroy(balls);
     pop.play();
@@ -155,6 +144,7 @@ function create() {
 } 
     
    
+    //game reset
      function popCheck(){
         livingB = bballs.countLiving();
         livingP = pballs.countLiving();
@@ -183,8 +173,6 @@ function create() {
     
          }
      
-         
-         
          function upCheck(){
              console.log("Have I been flipped yet?")
              if (y < 0 ){
@@ -207,28 +195,15 @@ function create() {
      }
 }
 
-
-    
-
-    
 function render () {
 
     game.debug.body(bballs);
     game.debug.body(gballs);
     game.debug.body(pballs);
-    
-
 }
 
 function update() {}
- 
-    
-    
 };
-    
-    
-        
-
 </script>
 </body>
 </html>
