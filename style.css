@@ -1,0 +1,38 @@
+body {
+    margin: 0 auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 999;
+    overflow: hidden;
+    vertical-align: bottom;
+}
+
+.home{
+    width: 50%;
+    margin:auto;
+    text-align: center;
+    padding: 50% 0;
+
+   
+    
+}
+
+button{
+    display: block;
+    margin:auto;
+    font-size: 3em;
+    background-color: rgba(244, 84, 98, 0.38);
+    border-radius: 20px;
+    padding: 10px;
+    
+}
+
+img{
+    padding:50% 0; 
+    width:100%;
+}
