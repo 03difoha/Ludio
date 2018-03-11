@@ -21,6 +21,7 @@ function preload() {
     game.load.audio('small', 'assets/audio/small.mp3');
     game.load.audio('pop', 'assets/audio/pop.mp3');
     
+    
 }
      
 function create() {
@@ -32,6 +33,13 @@ function create() {
             game.physics.p2.gravity.y = 10 * y
         }, true);
 	} 
+    
+    if (window.DeviceOrientationEvent) {
+  // Our browser supports DeviceOrientation
+          console.log("browser does support Device Orientation");
+    } else {
+  console.log("Sorry, your browser doesn't support Device Orientation");
+    }
     
     window.addEventListener("deviceorientation", this.handleOrientation, true);
     
@@ -157,7 +165,6 @@ function create() {
          
          }
      
-         
          
          function upCheck(){
              console.log("Have I been flipped yet?")
